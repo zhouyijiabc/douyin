@@ -1,3 +1,4 @@
+from pickletools import read_bytes1
 import sys
 import  pyautogui as pya
 from random import randint, choice
@@ -23,16 +24,24 @@ def get_position(pic_path, confidence=1):
     xy_list = [pya.center(i) for i in aa]
     return xy_list
 
+def get_msg_list(msg_txt):
+    with open(msg_txt,'r',encoding='utf-8') as f:
+        msg_list = f.readlines()
+    msg_list = [i.replace('\n','') for i in msg_list]
+    return msg_list
+
 def random_msg():
-    l1 = ['已拍','拍了','买了','我拍了','刚拍了','刚买了','冲了','要了','下单了']
-    l2 = ['1号','2号','3号','臭干子','八宝丝','4种辣条礼包']
-    l3 = ['加急','快点发货','加加急','今天发货哦','快点发','日期新鲜吗？','想吃','加加急','上午发','快点哦','哈哈','嘻嘻','发快点','等着吃','啊啊','同学经常给我吃','学校有卖，比这贵','就爱吃飞旺','现在就发','马上发','香香辣辣的']
-    l4 = ['小时候经常吃','上学吃过','小时候的味道','臭干子yyds','从小到大都吃','比卫龙好吃多了，不喜欢吃甜辣',
-          '冲冲冲','姐妹们，不要犹豫，冲冲冲','这价格，良心商家','上学就吃这个','良心商家','中学就吃这个','下课就买这个',
-          '小时候买都要5毛，划算','是小时候的味道吗','两天就炫完了，回购','这个巨好吃','有没有组合套餐','很实惠',
-          '上学的时候吃过贼好吃','飞旺辣条我的童年','童年回忆','小时候一天买一根','中学的时候天天必吃',
-          '贼喜欢吃飞旺','好久没吃过了，想要','是新鲜日期吗','就是这个味道','就是这个包装','小时候的辣条，配饭吃贼香',
-          '上学跟同座一人一根']
+    global change_msg
+    global res0
+    global res1
+    global res2
+    global res3
+    
+    l1 = get_msg_list('m1.txt')
+    l2 = get_msg_list('m2.txt')
+    l3 = get_msg_list('m3.txt')
+    l4 = get_msg_list('m4.txt')
+    l5 = get_msg_list('m5.txt')
     s1 = choice(l1) + ','+choice(l2) + ',' + choice(l3) + ',' + choice(l4)
     s2 = choice(l1) + ',' + choice(l3) + ',' + choice(l4)
     s3 = choice(l1)
@@ -41,8 +50,14 @@ def random_msg():
     s6 = choice(l2) + ',' + choice(l3)
     s7 = choice(l3) + ',' + choice(l4)
     s8 = choice(l1) + ',' + choice(l4)
-    res = choice([s1,s2,s3,s4,s5,s6,s7,s8])
-    return res
+    s9 = choice(l5)
+    res0 = choice([s1,s2,s3,s4,s5,s6,s7,s8,s9])
+    res1 = choice(s9) # 搞笑话术
+    res2 = s5 #询单聊天
+    res3 = choice(l1) + ','+choice(l2) + ',' + choice(l3) # 排单话术
+    
+    change_msg = res0
+    return change_msg
 
 
 def change_is_stop():
@@ -54,8 +69,32 @@ def change_is_stop():
         is_stop = True
         print('已停止')
 
+def change_msg_list():
+    global change_msg
+    global res0
+    global res1
+    global res2
+    global res3
+
+    if change_msg is res0:
+        print('已切换成搞笑话术')
+        change_msg = res1
+    elif change_msg is res1:
+        print('已切换成询单话术')
+        change_msg = res2
+    elif change_msg is res2:
+        print('已切换成拍单话术')
+        change_msg = res3
+    else:
+        change_msg = res0
+        print('已切换成混搭话术')
+        
+
 def change_interval_time():
     global interval_time
+    if interval_time == (1, 5):
+        interval_time = (5, 10)
+        print('已调整发送间隔时间为： 5-10 秒')
     if interval_time == (5, 10):
         interval_time = (10, 15)
         print('已调整发送间隔时间为： 10-15 秒')
@@ -72,12 +111,13 @@ def change_interval_time():
         interval_time = (30, 50)
         print('已调整发送间隔时间为： 30-50 秒')
     else:
-        interval_time = (5,10)
-        print('已调整发送间隔时间为： 5-10 秒')
+        interval_time = (1,5)
+        print('已调整发送间隔时间为： 1-5 秒')
 
 def cat():
     with keyboard.GlobalHotKeys({
             '<alt>+c': change_is_stop,
+            '<alt>+m': change_msg_list,
             '<alt>+t': change_interval_time}) as h:
         h.join()
 
@@ -95,7 +135,7 @@ def t():
     global is_stop
     is_stop = False
     global interval_time
-    interval_time = (5, 10)
+    interval_time = (1, 5)
     sleep_time = 0
     msg_num = 0
     while True:
@@ -111,11 +151,12 @@ def t():
                 msg = random_msg()
                 # msg = '好搞笑'
                 pyperclip.copy(msg)
-                pya.click(x-80, y, duration=1)
-                sleep(randint(1, 2))
+                pya.click(x-80, y)
+                # sleep(randint(1, 2))
                 pya.hotkey('ctrl', 'v')
-                sleep(randint(1, 2))
+                sleep(1)
                 pya.hotkey('enter')
+                print(interval_time)
                 sleep(randint(interval_time[0], interval_time[1]))
                 msg_num +=1
                 print(f'正在发送第 {msg_num} 条弹幕：  ', msg)
@@ -133,4 +174,4 @@ if __name__ == '__main__':
     t2.start()
     t1.join()
     t2.join()
-
+        
