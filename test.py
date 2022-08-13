@@ -54,9 +54,25 @@ def change_is_stop():
         is_stop = True
         print('已停止')
 
+def change_interval_time():
+    global interval_time
+    if interval_time == (5, 10):
+        interval_time = (10, 15)
+        print('已调整发送间隔时间为： 10-15 秒')
+    elif interval_time == (10,15):
+        interval_time= (15, 20)
+        print('已调整发送间隔时间为： 15-20 秒')
+    elif interval_time == (15, 20):
+        interval_time = (20, 25)
+        print('已调整发送间隔时间为： 20-25 秒')
+    elif interval_time == (20, 25):
+        interval_time = (25, 30)
+        print('已调整发送间隔时间为： 20-25 秒')
+
 def cat():
     with keyboard.GlobalHotKeys({
-            '<alt>+c': change_is_stop}) as h:
+            '<alt>+c': change_is_stop,
+            '<alt>+t': change_interval_time}) as h:
         h.join()
 
 def send_msg(msg,postion_tuple):
@@ -72,6 +88,8 @@ def send_msg(msg,postion_tuple):
 def t():
     global is_stop
     is_stop = False
+    global interval_time
+    interval_time = (5, 10)
     sleep_time = 0
     msg_num = 0
     while True:
@@ -86,7 +104,7 @@ def t():
                 pya.hotkey('ctrl', 'v')
                 sleep(randint(1, 2))
                 pya.hotkey('enter')
-                sleep(randint(5, 10))
+                sleep(randint(interval_time[0], interval_time[1]))
                 msg_num +=1
                 print(f'正在发送第 {msg_num} 条弹幕：  ', msg)
             else:
