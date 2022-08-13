@@ -67,7 +67,13 @@ def change_interval_time():
         print('已调整发送间隔时间为： 20-25 秒')
     elif interval_time == (20, 25):
         interval_time = (25, 30)
-        print('已调整发送间隔时间为： 20-25 秒')
+        print('已调整发送间隔时间为： 25-30 秒')
+    elif interval_time == (25, 30):
+        interval_time = (30, 50)
+        print('已调整发送间隔时间为： 30-50 秒')
+    else:
+        interval_time = (5,10)
+        print('已调整发送间隔时间为： 5-10 秒')
 
 def cat():
     with keyboard.GlobalHotKeys({
@@ -93,7 +99,13 @@ def t():
     sleep_time = 0
     msg_num = 0
     while True:
-        xy_list = get_position('./send.png', 0.8)
+        try:
+            xy_list = get_position('./send.png', 0.8)
+        except Exception as e:
+            print('请确保图片正确，或者要找的图片在屏幕上')
+            print(e)
+            pass
+
         for x, y in xy_list:
             if is_stop is False:
                 msg = random_msg()
